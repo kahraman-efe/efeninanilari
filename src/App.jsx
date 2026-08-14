@@ -9,6 +9,12 @@ function App() {
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
 
+  // Admin ile ilgili state'ler
+  const [session, setSession] = useState(null)
+  const [loginEmail, setLoginEmail] = useState('')
+  const [loginPassword, setLoginPassword] = useState('')
+  const [showLogin, setShowLogin] = useState(false)
+
   const photos = Array.from(
     { length: 173 },
     (_, i) => `/anilar/foto${i + 1}.png`
@@ -19,6 +25,7 @@ function App() {
     const { data, error } = await supabase
       .from('comments')
       .select('*')
+      .eq('approved', true) // 👈 sadece onaylı yorumlar gösterilsin
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -29,9 +36,23 @@ function App() {
     setComments(data)
   }
 
-  // Sayfa açıldığında yorumları getir
+  // Sayfa açıldığında yorumları getir + oturumu kontrol et
   useEffect(() => {
     fetchComments()
+
+    // Mevcut oturumu kontrol et
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+
+    // Oturum değişikliklerini dinle
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
   // Yorum gönder
@@ -45,14 +66,12 @@ function App() {
 
     setLoading(true)
 
-    const { error } = await supabase
-      .from('comments')
-      .insert([
-        {
-          name: name.trim(),
-          content: content.trim(),
-        },
-      ])
+    const { error } = await supabase.from('comments').insert([
+      {
+        name: name.trim(),
+        content: content.trim(),
+      },
+    ])
 
     if (error) {
       console.error('Yorum gönderilemedi:', error)
@@ -66,6 +85,41 @@ function App() {
     setLoading(false)
   }
 
+  // Admin giriş
+  const handleLogin = async (e) => {
+    e.preventDefault()
+    const { error } = await supabase.auth.signInWithPassword({
+      email: loginEmail,
+      password: loginPassword,
+    })
+
+    if (error) {
+      alert('Giriş başarısız: ' + error.message)
+    } else {
+      setLoginEmail('')
+      setLoginPassword('')
+      setShowLogin(false)
+    }
+  }
+
+  // Admin çıkış
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+  }
+
+  // Yorum sil
+  const deleteComment = async (id) => {
+    if (!confirm('Bu yorumu silmek istediğine emin misin?')) return
+
+    const { error } = await supabase.from('comments').delete().eq('id', id)
+
+    if (error) {
+      alert('Yorum silinemedi: ' + error.message)
+    } else {
+      await fetchComments()
+    }
+  }
+
   const openPhoto = (index) => {
     setSelectedPhoto(index)
   }
@@ -75,15 +129,12 @@ function App() {
   }
 
   const nextPhoto = () => {
-    setSelectedPhoto(
-      (current) => (current + 1) % photos.length
-    )
+    setSelectedPhoto((current) => (current + 1) % photos.length)
   }
 
   const previousPhoto = () => {
     setSelectedPhoto(
-      (current) =>
-        (current - 1 + photos.length) % photos.length
+      (current) => (current - 1 + photos.length) % photos.length
     )
   }
 
@@ -102,7 +153,33 @@ function App() {
         >
           Yorumlar ↓
         </button>
+
+        {session ? (
+          <button onClick={handleLogout}>Çıkış Yap</button>
+        ) : (
+          <button onClick={() => setShowLogin(!showLogin)}>
+            Admin Girişi
+          </button>
+        )}
       </header>
+
+      {showLogin && !session && (
+        <form className="admin-login" onSubmit={handleLogin}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={loginEmail}
+            onChange={(e) => setLoginEmail(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Şifre"
+            value={loginPassword}
+            onChange={(e) => setLoginPassword(e.target.value)}
+          />
+          <button type="submit">Giriş Yap</button>
+        </form>
+      )}
 
       {/* FOTOĞRAFLAR */}
 
@@ -113,10 +190,7 @@ function App() {
             key={photo}
             onClick={() => openPhoto(index)}
           >
-            <img
-              src={photo}
-              alt={`Anı ${index + 1}`}
-            />
+            <img src={photo} alt={`Anı ${index + 1}`} />
           </button>
         ))}
       </section>
@@ -124,14 +198,8 @@ function App() {
       {/* BÜYÜK FOTOĞRAF */}
 
       {selectedPhoto !== null && (
-        <div
-          className="lightbox"
-          onClick={closePhoto}
-        >
-          <button
-            className="close-button"
-            onClick={closePhoto}
-          >
+        <div className="lightbox" onClick={closePhoto}>
+          <button className="close-button" onClick={closePhoto}>
             ×
           </button>
 
@@ -166,20 +234,12 @@ function App() {
 
       {/* YORUMLAR */}
 
-      <section
-        id="comments"
-        className="comments-section"
-      >
+      <section id="comments" className="comments-section">
         <h2>Yorumlar</h2>
 
-        <p>
-          Bu anılar hakkında ne düşünüyorsun?
-        </p>
+        <p>Bu anılar hakkında ne düşünüyorsun?</p>
 
-        <form
-          className="comment-box"
-          onSubmit={addComment}
-        >
+        <form className="comment-box" onSubmit={addComment}>
           <input
             type="text"
             placeholder="Adınız"
@@ -195,13 +255,8 @@ function App() {
             maxLength={1000}
           />
 
-          <button
-            type="submit"
-            disabled={loading}
-          >
-            {loading
-              ? 'Gönderiliyor...'
-              : 'Yorum Gönder'}
+          <button type="submit" disabled={loading}>
+            {loading ? 'Gönderiliyor...' : 'Yorum Gönder'}
           </button>
         </form>
 
@@ -209,19 +264,23 @@ function App() {
 
         <div className="comments-list">
           {comments.map((comment) => (
-            <article
-              className="comment"
-              key={comment.id}
-            >
+            <article className="comment" key={comment.id}>
               <strong>{comment.name}</strong>
 
               <p>{comment.content}</p>
 
               <small>
-                {new Date(
-                  comment.created_at
-                ).toLocaleString('tr-TR')}
+                {new Date(comment.created_at).toLocaleString('tr-TR')}
               </small>
+
+              {session && (
+                <button
+                  className="delete-button"
+                  onClick={() => deleteComment(comment.id)}
+                >
+                  Sil
+                </button>
+              )}
             </article>
           ))}
         </div>
