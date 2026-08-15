@@ -1,16 +1,13 @@
+/* ---------- GENEL ---------- */
 * {
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
   margin: 0;
-  background: #111;
-  color: white;
-  font-family: Arial, sans-serif;
+  background: #0a0a0a;
+  color: #f5f5f5;
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
 main {
@@ -18,48 +15,54 @@ main {
 }
 
 header {
-  text-align: center;
-  padding: 60px 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #2a2a2a;
 }
 
 header h1 {
-  margin: 0 0 25px;
-  font-size: 42px;
-  font-weight: 500;
+  font-size: 20px;
+  margin: 0;
 }
 
 .comments-button {
-  border: 1px solid #555;
   background: transparent;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 30px;
+  border: 1px solid #333;
+  color: #ccc;
+  border-radius: 8px;
+  padding: 8px 14px;
   cursor: pointer;
-  transition: 0.3s;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .comments-button:hover {
-  background: white;
-  color: #111;
+  background: #1a1a1a;
+  border-color: #555;
 }
 
-/* FOTOĞRAF GRID */
-
+/* ---------- GALERİ ---------- */
 .gallery {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
-  padding: 5px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+  padding: 16px;
 }
 
 .photo-card {
-  border: 0;
+  border: none;
   padding: 0;
-  margin: 0;
+  background: none;
   cursor: pointer;
   overflow: hidden;
-  background: none;
+  border-radius: 8px;
   aspect-ratio: 1 / 1;
+  transition: transform 0.2s ease;
+}
+
+.photo-card:hover {
+  transform: scale(1.03);
 }
 
 .photo-card img {
@@ -67,15 +70,9 @@ header h1 {
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.4s ease;
 }
 
-.photo-card:hover img {
-  transform: scale(1.05);
-}
-
-/* BÜYÜK FOTOĞRAF */
-
+/* ---------- LIGHTBOX ---------- */
 .lightbox {
   position: fixed;
   inset: 0;
@@ -84,144 +81,424 @@ header h1 {
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  animation: fadeIn 0.25s ease;
 }
 
 .lightbox-image {
-  max-width: 85vw;
-  max-height: 85vh;
+  max-width: 90vw;
+  max-height: 90vh;
   object-fit: contain;
-  animation: photoIn 0.3s ease;
+  border-radius: 8px;
 }
 
 .close-button {
   position: absolute;
   top: 20px;
-  right: 30px;
+  right: 24px;
   background: none;
   border: none;
-  color: white;
-  font-size: 45px;
+  color: #fff;
+  font-size: 32px;
   cursor: pointer;
+  z-index: 1001;
 }
 
 .navigation {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  border: none;
   background: rgba(255, 255, 255, 0.1);
-  color: white;
-  font-size: 60px;
-  width: 60px;
-  height: 80px;
+  border: none;
+  color: #fff;
+  font-size: 36px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   cursor: pointer;
-  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
 }
 
 .navigation:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
 }
 
-.previous {
+.navigation.previous {
   left: 20px;
 }
 
-.next {
+.navigation.next {
   right: 20px;
 }
 
-/* YORUMLAR */
-
+/* ---------- YORUMLAR BÖLÜMÜ ---------- */
 .comments-section {
-  max-width: 800px;
-  margin: 150px auto;
-  padding: 40px 20px;
+  padding: 40px 20px 60px;
   text-align: center;
 }
 
 .comments-section h2 {
-  font-size: 36px;
-  margin-bottom: 10px;
+  font-size: 24px;
+  margin-bottom: 4px;
 }
 
-.comments-section p {
-  color: #aaa;
+.comments-subtitle {
+  color: #888;
+  margin-bottom: 24px;
 }
 
-.comment-box {
+/* Yorum Formu */
+.comment-form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  margin-top: 30px;
+  gap: 12px;
+  max-width: 500px;
+  margin: 0 auto 32px;
 }
 
-.comment-box input,
-.comment-box textarea {
-  width: 100%;
-  padding: 15px;
+.comment-input,
+.comment-textarea {
+  background: #1a1a1a;
   border: 1px solid #333;
-  background: #1b1b1b;
-  color: white;
   border-radius: 8px;
-  font-size: 16px;
+  padding: 12px 14px;
+  color: #f5f5f5;
+  font-size: 15px;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.comment-box textarea {
-  min-height: 120px;
+.comment-textarea {
+  min-height: 100px;
   resize: vertical;
 }
 
-.comment-box button {
-  padding: 14px;
+.comment-input:focus,
+.comment-textarea:focus {
+  outline: none;
+  border-color: #888;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
+}
+
+.comment-submit {
+  background: #f5f5f5;
+  color: #111;
   border: none;
   border-radius: 8px;
+  padding: 12px;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 16px;
+  transition: opacity 0.2s ease;
 }
 
-/* ANİMASYONLAR */
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+.comment-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-@keyframes photoIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.comment-submit:hover:not(:disabled) {
+  opacity: 0.9;
 }
 
-/* TELEFON */
+/* Yorum Kartları */
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 500px;
+  margin: 0 auto;
+}
 
-@media (max-width: 700px) {
-  header h1 {
-    font-size: 30px;
-  }
+.comment-card {
+  background: #161616;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  padding: 14px 16px;
+  text-align: left;
+}
 
-  .gallery {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.comment-header {
+  margin-bottom: 6px;
+}
 
-  .lightbox-image {
-    max-width: 95vw;
-    max-height: 80vh;
-  }
+.comment-name {
+  font-weight: 600;
+  color: #f5f5f5;
+  font-size: 14px;
+}
 
-  .navigation {
-    font-size: 40px;
-    width: 45px;
-  }
+.comment-content {
+  color: #ccc;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 6px 0;
+  word-wrap: break-word;
+}
+
+.comment-date {
+  color: #777;
+  font-size: 12px;
+}
+
+.comments-empty {
+  text-align: center;
+  color: #888;
+  margin: 24px 0;
+}
+
+.load-more-button {
+  background: transparent;
+  border: 1px solid #333;
+  color: #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s ease;
+}
+
+.load-more-button:hover {
+  background: #1a1a1a;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 1000;
+  animation: toast-in 0.2s ease;
+}
+
+.toast-success {
+  background: #1e3a2f;
+  color: #7ee8a0;
+  border: 1px solid #2d5940;
+}
+
+.toast-error {
+  background: #3a1e1e;
+  color: #e87e7e;
+  border: 1px solid #593030;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ---------- ADMIN LOGIN ---------- */
+.admin-login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a0a;
+}
+
+.admin-login-card {
+  background: #161616;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 32px;
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: center;
+}
+
+.admin-login-card h1 {
+  font-size: 20px;
+  color: #f5f5f5;
+  margin: 0;
+}
+
+.admin-login-card p {
+  color: #888;
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+
+.admin-login-card input {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: #f5f5f5;
+  font-size: 15px;
+}
+
+.admin-login-card input:focus {
+  outline: none;
+  border-color: #888;
+}
+
+.admin-login-card button {
+  background: #f5f5f5;
+  color: #111;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.admin-login-error {
+  color: #e87e7e;
+  font-size: 13px;
+}
+
+/* ---------- ADMIN DASHBOARD ---------- */
+.admin-dashboard {
+  min-height: 100vh;
+  background: #0a0a0a;
+  padding: 20px;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #2a2a2a;
+  margin-bottom: 20px;
+}
+
+.admin-header h1 {
+  font-size: 18px;
+  color: #f5f5f5;
+  margin: 0;
+}
+
+.admin-header span {
+  color: #777;
+  font-size: 13px;
+}
+
+.admin-header button {
+  background: transparent;
+  border: 1px solid #333;
+  color: #ccc;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.admin-stats {
+  color: #ccc;
+  margin-bottom: 20px;
+  font-size: 15px;
+}
+
+.admin-comments {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 700px;
+}
+
+.admin-comment-row {
+  background: #161616;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.admin-comment-row strong {
+  color: #f5f5f5;
+  font-size: 14px;
+}
+
+.admin-comment-row p {
+  color: #ccc;
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+.admin-comment-row span {
+  color: #777;
+  font-size: 12px;
+}
+
+.admin-delete-btn {
+  background: #3a1e1e;
+  color: #e87e7e;
+  border: 1px solid #593030;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.admin-loading {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #ccc;
+  gap: 12px;
+  background: #0a0a0a;
+}
+
+/* ---------- CONFIRM MODAL ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal-box {
+  background: #161616;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 320px;
+  text-align: center;
+}
+
+.modal-box p {
+  color: #f5f5f5;
+  margin-bottom: 16px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.modal-cancel {
+  background: transparent;
+  border: 1px solid #333;
+  color: #ccc;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.modal-confirm {
+  background: #3a1e1e;
+  color: #e87e7e;
+  border: 1px solid #593030;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
 }
