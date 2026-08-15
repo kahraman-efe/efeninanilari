@@ -37,14 +37,17 @@ function AdminDashboard() {
     checkSession()
   }, [navigate])
 
-  const fetchAllComments = async () => {
-    const { data, error } = await supabase
-      .from('comments')
-      .select('*')
-      .order('created_at', { ascending: false })
+ const fetchAllComments = async () => {
+  const { data, error } = await supabase
+    .from('comments')
+    .select('*')
+    .order('created_at', { ascending: false })
 
-    if (!error) setComments(data)
-  }
+  console.log('DATA:', data)
+  console.log('ERROR:', error)
+
+  if (!error) setComments(data)
+}
 
   const handleDelete = async () => {
     const { error } = await supabase
