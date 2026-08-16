@@ -11,7 +11,7 @@ function Home() {
   const [toast, setToast] = useState(null)
 
   const photos = Array.from(
-    { length: 173 },
+    { length: 204 },
     (_, i) => `/anilar/foto${i + 1}.png`
   )
 
