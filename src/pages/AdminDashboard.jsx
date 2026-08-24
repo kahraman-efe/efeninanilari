@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import ConfirmModal from '../components/ConfirmModal'
 import Toast from '../components/Toast'
+import AdminVideoManager from '../components/AdminVideoManager'
 
 function AdminDashboard() {
   const [session, setSession] = useState(null)
@@ -126,6 +127,10 @@ function AdminDashboard() {
           onCancel={() => setDeleteTarget(null)}
         />
       )}
+
+      <AdminVideoManager
+        onToast={(message, type) => setToast({ message, type })}
+      />
 
       {toast && (
         <Toast
