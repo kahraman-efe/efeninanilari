@@ -4,6 +4,7 @@ import { supabase } from '../supabase'
 import ConfirmModal from '../components/ConfirmModal'
 import Toast from '../components/Toast'
 import AdminVideoManager from '../components/AdminVideoManager'
+import AdminPhotoManager from '../components/AdminPhotoManager'
 
 function AdminDashboard() {
   const [session, setSession] = useState(null)
@@ -127,6 +128,10 @@ function AdminDashboard() {
           onCancel={() => setDeleteTarget(null)}
         />
       )}
+
+      <AdminPhotoManager
+        onToast={(message, type) => setToast({ message, type })}
+      />
 
       <AdminVideoManager
         onToast={(message, type) => setToast({ message, type })}
