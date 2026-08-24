@@ -3,17 +3,36 @@ import { supabase } from '../supabase'
 import CommentForm from '../components/CommentForm'
 import CommentList from '../components/CommentList'
 import Toast from '../components/Toast'
+import MainNav from '../components/MainNav'
 import '../App.css'
 
 function Home() {
   const [selectedPhoto, setSelectedPhoto] = useState(null)
   const [comments, setComments] = useState([])
   const [toast, setToast] = useState(null)
+  const [extraPhotos, setExtraPhotos] = useState([])
 
-  const photos = Array.from(
+  const staticPhotos = Array.from(
     { length: 204 },
     (_, i) => `/anilar/foto${i + 1}.png`
   )
+
+  // Statik 204 fotoğraf + admin panelinden Supabase'e eklenen ek fotoğraflar
+  const photos = [...staticPhotos, ...extraPhotos.map((p) => p.photo_url)]
+
+  const fetchExtraPhotos = async () => {
+    const { data, error } = await supabase
+      .from('photos')
+      .select('*')
+      .order('created_at', { ascending: true })
+
+    if (error) {
+      console.error('Ek fotoğraflar alınamadı:', error)
+      return
+    }
+
+    setExtraPhotos(data)
+  }
 
   const fetchComments = async () => {
     const { data, error } = await supabase
@@ -32,6 +51,7 @@ function Home() {
 
   useEffect(() => {
     fetchComments()
+    fetchExtraPhotos()
   }, [])
 
   const openPhoto = (index) => setSelectedPhoto(index)
@@ -44,14 +64,17 @@ function Home() {
     <main>
       <header>
         <h1>Efe'nin Anıları</h1>
-        <button
-          className="comments-button"
-          onClick={() =>
-            document.getElementById('comments').scrollIntoView({ behavior: 'smooth' })
-          }
-        >
-          Yorumlar ↓
-        </button>
+        <div className="header-actions">
+          <MainNav />
+          <button
+            className="comments-button"
+            onClick={() =>
+              document.getElementById('comments').scrollIntoView({ behavior: 'smooth' })
+            }
+          >
+            Yorumlar ↓
+          </button>
+        </div>
       </header>
 
       <section className="gallery">
